@@ -1,23 +1,34 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Department {
+public class Department implements Serializable {
     private int departmentId;
     private String departmentName;
     private ArrayList<Doctor> doctors;
+    private static ArrayList<Integer> existingDepartmentIds = new ArrayList<>();
 
     public Department(int departmentId, String departmentName) {
+        if (!isValidDepartmentId(departmentId)) {
+            throw new IllegalArgumentException("Department ID already exists");
+        }
         this.departmentId = departmentId;
         this.departmentName = departmentName;
-        this.doctors= new ArrayList<>();
-
+        this.doctors = new ArrayList<>();
+        existingDepartmentIds.add(departmentId);
     }
+    
 
     public int getDepartmentId() {
         return departmentId;
     }
 
     public void setDepartmentId(int departmentId) {
+        if (!isValidDepartmentId(departmentId)) {
+            throw new IllegalArgumentException("Department ID already exists");
+        }
+        existingDepartmentIds.remove(Integer.valueOf(this.departmentId));
         this.departmentId = departmentId;
+        existingDepartmentIds.add(departmentId);
     }
 
     public String getDepartmentName() {
@@ -44,6 +55,10 @@ public class Department {
     }
     public void displayDepartmentDetails() {
         System.out.println("Department ID : "+ departmentId + "Department Name : "+ departmentName);
+    }
+
+    private boolean isValidDepartmentId(int departmentId) {
+        return !existingDepartmentIds.contains(departmentId);
     }
 
 }

@@ -1,4 +1,6 @@
-public class Patient extends Person { // you must implements Serializable.
+import java.io.Serializable;
+
+public class Patient extends Person implements Serializable {
 
     private int age;
     private String medicalHistory;

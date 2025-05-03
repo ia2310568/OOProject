@@ -1,4 +1,5 @@
-public class Contact extends Person {  // // you must implements Serializable.
+import java.io.Serializable;
+public class Contact extends Person implements Serializable {
 
     private String email;
     private String phoneNumber;

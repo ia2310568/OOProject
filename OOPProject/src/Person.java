@@ -1,4 +1,7 @@
-public abstract class Person {   // you must implements Serializable.
+import java.io.Serial;
+import java.io.Serializable;
+
+public abstract class Person implements Serializable {
     private int id;
     private String name;
     private Contact contact;

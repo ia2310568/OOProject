@@ -2,11 +2,11 @@ import java.io.*;
 import java.util.*;
 
 public class HospitalSystem implements Payable, Serializable {
-    private List<Patient> patients;
-    private List<Doctor> doctors;
-    private List<Appointment> appointments;
-    private List<Bill> bills;
-    private List<Department> departments;
+    private ArrayList<Patient> patients;
+    private ArrayList<Doctor> doctors;
+    private ArrayList<Appointment> appointments;
+    private ArrayList<Bill> bills;
+    private ArrayList<Department> departments;
     private int nextPatientId = 1000;
     private int nextDoctorId = 2000;
     private int nextAppointmentId = 3000;
@@ -21,7 +21,7 @@ public class HospitalSystem implements Payable, Serializable {
         this.departments = new ArrayList<>();
     }
 
-    public HospitalSystem(List<Patient> patients, List<Doctor> doctors, List<Appointment> appointments, List<Bill> bills, List<Department> departments) {
+    public HospitalSystem(ArrayList<Patient> patients, ArrayList<Doctor> doctors, ArrayList<Appointment> appointments, ArrayList<Bill> bills, ArrayList<Department> departments) {
         this.patients = patients;
         this.doctors = doctors;
         this.appointments = appointments;
@@ -29,43 +29,43 @@ public class HospitalSystem implements Payable, Serializable {
         this.departments = departments;
     }
 
-    public List<Patient> getPatients() {
+    public ArrayList<Patient> getPatients() {
         return patients;
     }
 
-    public void setPatients(List<Patient> patients) {
+    public void setPatients(ArrayList<Patient> patients) {
         this.patients = patients;
     }
 
-    public List<Doctor> getDoctors() {
+    public ArrayList<Doctor> getDoctors() {
         return doctors;
     }
 
-    public void setDoctors(List<Doctor> doctors) {
+    public void setDoctors(ArrayList<Doctor> doctors) {
         this.doctors = doctors;
     }
 
-    public List<Appointment> getAppointments() {
+    public ArrayList<Appointment> getAppointments() {
         return appointments;
     }
 
-    public void setAppointments(List<Appointment> appointments) {
+    public void setAppointments(ArrayList<Appointment> appointments) {
         this.appointments = appointments;
     }
 
-    public List<Bill> getBills() {
+    public ArrayList<Bill> getBills() {
         return bills;
     }
 
-    public void setBills(List<Bill> bills) {
+    public void setBills(ArrayList<Bill> bills) {
         this.bills = bills;
     }
 
-    public List<Department> getDepartments() {
+    public ArrayList<Department> getDepartments() {
         return departments;
     }
 
-    public void setDepartments(List<Department> departments) {
+    public void setDepartments(ArrayList<Department> departments) {
         this.departments = departments;
     }
 
@@ -124,11 +124,22 @@ public class HospitalSystem implements Payable, Serializable {
     }
 
     public boolean scheduleAppointment(Appointment appointment) {
-        if (!appointments.contains(appointment)) {
-            appointments.add(appointment);
-            return true;
+        // Check if appointment already exists
+        for (Appointment existingAppointment : appointments) {
+            if (existingAppointment.getDoctorId() == appointment.getDoctorId()
+                    && existingAppointment.getAppointmentDate().equals(appointment.getAppointmentDate())
+                    && existingAppointment.getAppointmentStatus() != AppointmentStatus.CANCELLED) {
+                return false;
+            }
         }
-        return false;
+
+        // Check if doctor is available
+        if (!isDoctorAvailable(appointment.getDoctorId(), appointment.getAppointmentDate())) {
+            return false;
+        }
+
+        appointments.add(appointment);
+        return true;
     }
 
     public boolean cancelAppointmentById(int appointmentId) {
@@ -231,7 +242,7 @@ public class HospitalSystem implements Payable, Serializable {
                 for (Appointment appointment : appointments) {
                     if (patientId == appointment.getPatientId() && appointment.getDoctorId() == doctor.getId()) {
                         earnings=bill.getAmount()*0.3;
-                        System.out.println("Doctor's Earnings: " + earnings);
+                        System.out.println(" Doctor's Earnings: " + earnings);
                     }
                 }
             }
@@ -291,11 +302,11 @@ public class HospitalSystem implements Payable, Serializable {
             ObjectInputStream departmentsIn = new ObjectInputStream(new FileInputStream("departments.dat"));
             ObjectInputStream countersIn = new ObjectInputStream(new FileInputStream("counters.dat"));
 
-            patients = (List<Patient>) patientsIn.readObject();
-            doctors = (List<Doctor>) doctorsIn.readObject();
-            appointments = (List<Appointment>) appointmentsIn.readObject();
-            bills = (List<Bill>) billsIn.readObject();
-            departments = (List<Department>) departmentsIn.readObject();
+            patients = (ArrayList<Patient>) patientsIn.readObject();
+            doctors = (ArrayList<Doctor>) doctorsIn.readObject();
+            appointments = (ArrayList<Appointment>) appointmentsIn.readObject();
+            bills = (ArrayList<Bill>) billsIn.readObject();
+            departments = (ArrayList<Department>) departmentsIn.readObject();
 
             int[] counters = (int[]) countersIn.readObject();
             nextPatientId = counters[0];
@@ -310,8 +321,22 @@ public class HospitalSystem implements Payable, Serializable {
             billsIn.close();
             departmentsIn.close();
             countersIn.close();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception e ) {
+            patients = new ArrayList<>();
+            doctors = new ArrayList<>();
+            appointments = new ArrayList<>();
+            bills = new ArrayList<>();
+            departments = new ArrayList<>();
         }
+    }
+    public boolean isDoctorAvailable(int doctorId, Date appointmentDate) {
+        for (Appointment existingAppointment : appointments) {
+            if (existingAppointment.getDoctorId() == doctorId && 
+                existingAppointment.getAppointmentDate().equals(appointmentDate) &&
+                existingAppointment.getAppointmentStatus() != AppointmentStatus.CANCELLED) {
+                return false;
+            }
+        }
+        return true;
     }
 }

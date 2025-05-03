@@ -1,7 +1,9 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-public class Bill implements Payable {
+public class Bill implements Payable, Serializable {
     private int billId;
     private int patientId;
     private double amount;
@@ -75,6 +77,11 @@ public class Bill implements Payable {
         return amount;
 
 
+    }
+    @Override
+    public String toString() {
+        return "Bill [billId=" + billId + ", patientId=" + patientId + ", amount=" + amount + ", services=" + services
+                + ", date=" + date + "]";
     }
 
 }
